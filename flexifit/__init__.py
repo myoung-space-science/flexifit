@@ -1,2 +1,2 @@
 from .core import FlexiFit
-from .forms import *
+from .forms import Var1D
