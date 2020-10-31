@@ -1,14 +1,14 @@
 import numpy as np
 import pytest
 
-from .context import flexifit
+from .context import core
 
 
 tolerance = 1e-8
 
 def test_linear():
     x = np.linspace(0, 1, 5)
-    f = flexifit.forms.Var1D(x)
+    f = core.forms.Var1D(x)
     c = [1.1, 1.1]
     result = [1.1, 1.375, 1.65, 1.925, 2.2]
     correct = pytest.approx(np.array(result), abs=tolerance)
@@ -16,7 +16,7 @@ def test_linear():
 
 def test_polynomial():
     x = np.linspace(0, 1, 5)
-    f = flexifit.forms.Var1D(x)
+    f = core.forms.Var1D(x)
     c = []
     results = [
         [1.1, 1.1, 1.1, 1.1, 1.1],
@@ -32,7 +32,7 @@ def test_polynomial():
 
 def test_exponential():
     x = np.linspace(0, 1, 5)
-    f = flexifit.forms.Var1D(x)
+    f = core.forms.Var1D(x)
     c = []
     results = [
         [1.1, 1.41242796, 1.8135934, 2.32870002, 2.99011001],
@@ -48,7 +48,7 @@ def test_exponential():
 
 def test_exponential_exception():
     x = np.linspace(0, 1, 5)
-    f = flexifit.forms.Var1D(x)
+    f = core.forms.Var1D(x)
     c = [1.1] * 5
     with pytest.raises(ValueError) as err:
         assert f.exponential(*c)
@@ -57,7 +57,7 @@ def test_exponential_exception():
 
 def test_single_power_law():
     x = np.linspace(0, 1, 5)
-    f = flexifit.forms.Var1D(x)
+    f = core.forms.Var1D(x)
     c = [1.1, 1.1]
     result = [0.0, 0.2394014, 0.51316815, 0.80160437, 1.1]
     correct = pytest.approx(np.array(result), abs=tolerance)

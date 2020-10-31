@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from .context import flexifit
+from .context import core
 
 
 def function(x, c0, c1, c2):
@@ -26,7 +26,7 @@ np.random.seed(1729)
 y_noise = 0.2 * np.random.normal(size=xdata.size)
 ydata = y + y_noise
 
-fit = flexifit.core.FlexiFit(
+fit = core.fitters.FlexiFit(
     function=function,
     free=free,
     fixed=fixed,
