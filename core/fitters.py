@@ -341,7 +341,7 @@ class FlexiFit:
     def _fit(self):
         """Fit the user-defined data.
         
-        The idependent-variable array may be a single array with the same shape as the dependent-variable array or an iterable of arrays with the same shape as the dependent-variable array.
+        The idependent-variable array may be a single array with the same shape as the dependent-variable array or an array with first dimension that is the same shape as the dependent-variable array.
         """
         xdata = self.dataset.xdata.copy()
         ydata = self.dataset.ydata.copy()
@@ -350,12 +350,12 @@ class FlexiFit:
         if len(yshape) == 1:
             ydata = ydata[np.newaxis, :]
             yshape = ydata.shape
-        if yshape[1] != xshape[0]:
+        if yshape[0] != xshape[0]:
             raise XYDataMismatch
         values = []
         covariance = []
         errmsgs = []
-        for yslice in ydata:
+        for yslice in ydata.transpose():
             self.runner.xdata = xdata
             self.runner.ydata = yslice
             _err = self.runner.compute(**self.context.fit_kw)
