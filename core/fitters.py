@@ -14,7 +14,17 @@ from scipy.optimize import curve_fit
 
 
 class XYDataMismatch(Exception):
-    pass
+    """The shapes of ``x`` and ``y`` do not match for this application."""
+    def __init__(self, x: np.ndarray, y: np.ndarray) -> None:
+        self.x = x
+        self.y = y
+
+    def __str__(self) -> str:
+        return (
+            f"x {self.x.shape}"
+            f" and y {self.y.shape}"
+            f" must have commensurate zeroth dimension"
+        )
 
 
 class _FitDataset:
@@ -351,7 +361,7 @@ class FlexiFit:
             ydata = ydata[np.newaxis, :]
             yshape = ydata.shape
         if yshape[0] != xshape[0]:
-            raise XYDataMismatch
+            raise XYDataMismatch(xdata, ydata)
         values = []
         covariance = []
         errmsgs = []
