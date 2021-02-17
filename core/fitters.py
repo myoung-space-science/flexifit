@@ -357,9 +357,6 @@ class FlexiFit:
         ydata = self.dataset.ydata.copy()
         xshape = xdata.shape
         yshape = ydata.shape
-        if len(yshape) == 1:
-            ydata = ydata[np.newaxis, :]
-            yshape = ydata.shape
         if yshape[0] != xshape[0]:
             raise XYDataMismatch(xdata, ydata)
         values = []
