@@ -359,10 +359,12 @@ class FlexiFit:
         yshape = ydata.shape
         if yshape[0] != xshape[0]:
             raise XYDataMismatch(xdata, ydata)
+        if ydata.ndim == 1:
+            ydata = np.expand_dims(ydata, axis=0)
         values = []
         covariance = []
         errmsgs = []
-        for yslice in ydata.transpose():
+        for yslice in ydata:
             self.runner.xdata = xdata
             self.runner.ydata = yslice
             _err = self.runner.compute(**self.context.fit_kw)
