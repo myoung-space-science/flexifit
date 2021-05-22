@@ -1,3 +1,4 @@
+import abc
 from typing import (
     Union,
     List,
@@ -6,25 +7,9 @@ from typing import (
     Iterable,
     Optional,
 )
-from collections import OrderedDict
-import abc
 
 import numpy as np
 from scipy.optimize import curve_fit
-
-
-class XYDataMismatch(Exception):
-    """The shapes of ``x`` and ``y`` do not match for this application."""
-    def __init__(self, x: np.ndarray, y: np.ndarray) -> None:
-        self.x = x
-        self.y = y
-
-    def __str__(self) -> str:
-        return (
-            f"x {self.x.shape}"
-            f" and y {self.y.shape}"
-            f" must have commensurate zeroth dimension"
-        )
 
 
 class _FitDataset:
@@ -32,18 +17,42 @@ class _FitDataset:
 
     def __init__(
         self,
-        xdata: Union[list, np.ndarray],
-        ydata: Union[list, np.ndarray],
+        xdata: Iterable,
+        ydata: Iterable,
     ):
         self._xdata = xdata
         self._ydata = ydata
 
-    @property
-    def xdata(self) -> np.ndarray:
+    def xdata(self, copy: bool=True) -> np.ndarray:
+        """The array of independent data.
+
+        Keyword Parameters
+        ------------------
+        copy : bool
+
+        If true (default), copy this instance's array. This is similar to
+        ``numpy.array(..., copy=True)`` except that it copies the array created
+        from user data rather than copying the user data when creating the
+        array.
+        """
+        if copy:
+            return np.array(self._xdata).copy()
         return np.array(self._xdata)
 
-    @property
-    def ydata(self) -> np.ndarray:
+    def ydata(self, copy: bool=False) -> np.ndarray:
+        """The array of dependent data.
+
+        Keyword Parameters
+        ------------------
+        copy : bool
+
+        If true (default), copy this instance's array. This is similar to
+        ``numpy.array(..., copy=True)`` except that it copies the array created
+        from user data rather than copying the user data when creating the
+        array.
+        """
+        if copy:
+            return np.array(self._ydata).copy()
         return np.array(self._ydata)
 
 
@@ -208,8 +217,7 @@ class _FitRunner(abc.ABC):
 
 
 class CurveFitRunner(_FitRunner):
-    """A class to manage fitting data with SciPy `curve_fit()`."""
-
+    """A class to manage fitting data with ``scipy.curve_fit``."""
     def compute(
         self,
         abort_on_error: bool=True,
@@ -243,10 +251,10 @@ class CurveFitRunner(_FitRunner):
 
 class FlexiFit:
     """A class that provides flexible data fitting.
-    
-    This class is capable of fitting a user-defined function with free parameters and parameter values chosen at runtime.
-    """
 
+    This class is capable of fitting a user-defined function with free
+    parameters and parameter values chosen at runtime.
+    """
     def __init__(
         self,
         function: Callable,
@@ -353,12 +361,13 @@ class FlexiFit:
         
         The idependent-variable array may be a single array with the same shape as the dependent-variable array or an array with first dimension that is the same shape as the dependent-variable array.
         """
-        xdata = self.dataset.xdata.copy()
-        ydata = self.dataset.ydata.copy()
+        xdata = self.dataset.xdata(copy=True)
+        ydata = self.dataset.ydata(copy=True)
         xshape = xdata.shape
         yshape = ydata.shape
         if yshape[0] != xshape[0]:
-            raise XYDataMismatch(xdata, ydata)
+            message = "X and Y must have the same zeroth dimension"
+            raise TypeError(message)
         if ydata.ndim == 1:
             ydata = np.expand_dims(ydata, axis=0)
         values = []
